@@ -1,23 +1,44 @@
+import { Fragment } from 'react';
 import Layout from '../components/layout';
 
 // game components
-import Desk from '../components/desk';
-import Square from '../components/square';
+import DeskComp from '../components/desk';
+import SquareComp from '../components/square';
 import Mine from '../components/mine';
 import Flag from '../components/flag';
+import { Desk } from '../models/desk';
 
-const Index = () => (
-  <Layout title={`Minesweeper (active)`}>
-    <Desk boardSize={10}>
-      {[...Array(100).keys()].map(i => (
-        <Square key={i} disabled={i === 55 || i === 10}>
-          {i === 10 && <Mine />}
-          {i === 25 && <Flag />}
-          {i === 77 ? '4' : ''}
-        </Square>
+// TODO: make board size configurable
+// TODO: add how many squares are available to discover until
+// win condition is satisfied.
+
+const Index = () => {
+  let desk = new Desk(10, 0);
+  console.log('desk', desk);
+
+  function onSquareClick(square) {
+    console.log(square);
+    square.reveal();
+  }
+
+  return (
+  <Layout title={`Minesweepin'`}>
+    <DeskComp boardSize={ desk.rows }>
+      { desk.squares.map((squareList, i) => (
+        <Fragment key={ i }>
+        { squareList.map((square, j) => (
+            <SquareComp key={ i + '-' + j } disabled={ square.disabled } onClick={ (e) => onSquareClick(square) }>
+              { square.showBomb() && <Mine />}
+              { square.flagged && <Flag />}
+              { square.showNumber() ? square.getNumber() : ''}
+            </SquareComp>
+          )
+        ) }
+        </Fragment>
       ))}
-    </Desk>
-  </Layout>
-);
+    </DeskComp>
+  </Layout>);
+}
+
 
 export default Index;
