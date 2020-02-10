@@ -7,6 +7,7 @@ const Square = createComponent(
     padding: 10,
     cursor: disabled ? 'initial' : 'pointer',
     backgroundColor: disabled ? '#CCC' : '#FFF',
+    pointerEvents: disabled ? 'none' : 'auto', 
     border: `1px solid black`,
     lineHeight: 1,
     textAlign: 'center',

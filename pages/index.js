@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import Layout from '../components/layout';
 
 // game components
@@ -13,32 +13,44 @@ import { Desk } from '../models/desk';
 // win condition is satisfied.
 
 const Index = () => {
-  let desk = new Desk(10, 0);
-  console.log('desk', desk);
+  const [desk, setDesk] = useState(new Desk(10, 10));
+  // counter for actions taken
+  const [actions, setActions] = useState(0);
 
   function onSquareClick(square) {
-    console.log(square);
-    square.reveal();
+    setActions(actions + 1);
+
+    if (square.hasBomb) {
+      window.alert("Whoops, looks like you lost - you'll gettem next time champ")
+      setDesk(new Desk(10, 10));
+    } else {
+      let newDesk = desk.findClearPath(square.row, square.column);
+      setDesk(newDesk.findClearPath(square));
+    }
   }
 
+  console.log('render');
   return (
-  <Layout title={`Minesweepin'`}>
-    <DeskComp boardSize={ desk.rows }>
-      { desk.squares.map((squareList, i) => (
-        <Fragment key={ i }>
-        { squareList.map((square, j) => (
-            <SquareComp key={ i + '-' + j } disabled={ square.disabled } onClick={ (e) => onSquareClick(square) }>
-              { square.showBomb() && <Mine />}
-              { square.flagged && <Flag />}
-              { square.showNumber() ? square.getNumber() : ''}
-            </SquareComp>
-          )
-        ) }
-        </Fragment>
-      ))}
-    </DeskComp>
-  </Layout>);
+    <Layout title={`Minesweepin'`}>
+      <DeskComp boardSize={ desk.rows }>
+        { desk.squares.map((squareList, i) => (
+          <Fragment key={ i }>
+          { squareList.map((square, j) => (
+              <SquareComp
+                key={ i + '-' + j }
+                disabled={ square.isRevealed }
+                onClick={ () => onSquareClick(square)}>
+                  { square.showBomb() && <Mine />}
+                  { square.flagged && <Flag />}
+                  { square.showNumber() ? square.number : ''}
+              </SquareComp>
+            )
+          ) }
+          </Fragment>
+        ))}
+      </DeskComp>
+    </Layout>
+  );
 }
-
 
 export default Index;

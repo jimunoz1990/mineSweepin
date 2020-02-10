@@ -1,9 +1,8 @@
 export class Square {
     constructor(row, column) {
-      this.hasBomb = true;
+      this.hasBomb = false;
       this.flagged = false;
       this.isRevealed = false;
-      this.disabled = false;
       this.row = row;
       this.column = column;
       this.number = null;
@@ -11,6 +10,7 @@ export class Square {
 
     reveal() {
       this.isRevealed = true;
+      return this
     }
 
     showBomb() {
