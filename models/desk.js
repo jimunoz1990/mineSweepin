@@ -13,6 +13,8 @@ export class Desk {
     this.rows = size;
     this.columns = size;
     this.squares = this.placeBombs(size, bombs);
+    this.disabled = false;
+    this.revealedSquares = 0;
   }
 
   // generate an empty grid
@@ -69,7 +71,7 @@ export class Desk {
     let count = 0;
     let row = square.row;
     let col = square.column;
-    let size = grid.row;
+    let size = this.rows;
 
     // up
     if (row !== 0) {
@@ -77,37 +79,37 @@ export class Desk {
     }
 
     // upright
-    if (row !== 0 && col < size - 1) {
+    if (row !== 0 && col !== size - 1) {
       count += grid[row - 1][col + 1].hasBomb;
     }
 
     // right
-    if (col < size - 1) {
+    if (col !== size - 1) {
       count += !! grid[row][col + 1].hasBomb;
     }
 
     // downright
-    if (row < size - 1 && col < size - 1) {
+    if (row !== size - 1 && col !== size - 1) {
       count += grid[row + 1][col + 1].hasBomb;
     }
 
     // down
-    if (row > size - 1) {
+    if (row !== size - 1) {
       count += grid[row + 1][col].hasBomb;
     }
 
     // downleft
-    if (row < size - 1 && col > 0) {
+    if (row !== size - 1 && col !== 0) {
       count += grid[row + 1][col - 1].hasBomb;
     }
 
     // left
-    if (col > 0) {
+    if (col !== 0) {
       count += grid[row][col - 1].hasBomb;
     }
 
     // upleft
-    if (col > 0 && row > 0) {
+    if (col !== 0 && row !== 0) {
       count += grid[row - 1][col - 1].hasBomb;
     }
 
@@ -118,12 +120,15 @@ export class Desk {
   findClearPath(row, col) {
     // ensure that the square is valid and without bomb, reveal it and then
     // continue expanding as long as the square does not have a displayNumber
-
+    if (row < 0 || row > this.rows || col < 0 || col > this.columns){
+        return this;
+    }
     if (!!this.squares[row] && !!this.squares[row][col] &&
       !this.squares[row][col].hasBomb && !this.squares[row][col].isRevealed) {
 
       this.squares[row][col].reveal();
-      if (!!this.squares[row][col].displayNumber) {
+      this.revealedSquares++;
+      if (this.squares[row][col].displayNumber === 0) {
         this.findClearPath(row - 1, col);
         this.findClearPath(row - 1, col + 1);
         this.findClearPath(row, col + 1);
@@ -134,10 +139,35 @@ export class Desk {
         this.findClearPath(row - 1, col - 1);
       }
     }
+    return this;
   }
 
   updateSquare(square) {
     this.squares[square.row][square.column] = square;
+    return this;
+  }
+
+  setDisabled(disabled) {
+    this.disabled = disabled;
+    return this;
+  }
+
+  // when the game is over show the user the board
+  uncoverBoard(gameOverRow, gameOverColumn, lose) {
+    for (let row = 0; row < this.rows; row++) {
+      for (let col = 0; col < this.columns; col++) {
+        let square = this.squares[row][col];
+        if (square.hasBomb) {
+            square.reveal();
+            this.squares[row][col] = square;
+        }
+      }
+    }
+
+    // only light up the end square if it was a losing square
+    if (lose) {
+        this.squares[gameOverRow][gameOverColumn].gameOver = true;
+    }
     return this;
   }
 }

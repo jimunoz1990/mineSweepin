@@ -10,6 +10,10 @@ import Flag from '../components/flag';
 // desk model
 import { Desk } from '../models/desk';
 
+// TODO: have gridSize and bombCount configurable by user
+// TODO: better way to reset the game instead of just losing
+// TODO: don't use window alerts, those are ugly and annoying
+
 const Index = () => {
   const [gridSize, setGridSize] = useState(10);
   const [bombCount, setBombCount] = useState(10);
@@ -19,9 +23,11 @@ const Index = () => {
 
   function onSquareClick(square) {
     let newDesk = null;
-    if (square.hasBomb) {
+
+    // detect losing/winning game conditions
+    if (square.hasBomb) { // losing
       window.setTimeout(() => {
-        window.alert("Whoops, looks like you lost - you'll gettem next time champ")
+        window.alert("Whoops, looks like you lost - you'll gettem next time!")
         newDesk = new Desk(gridSize, bombCount);
         setDesk(newDesk);
       }, 1500)
@@ -30,7 +36,7 @@ const Index = () => {
       setActions(0);
     } else  {
       newDesk = desk.findClearPath(square.row, square.column);
-      if (newDesk.revealedSquares === (Math.pow(gridSize, 2) - bombCount)) {
+      if (newDesk.revealedSquares === (Math.pow(gridSize, 2) - bombCount)) { // winning
           window.setTimeout(() => {
             window.alert("You did it, congratulations!")
             newDesk = new Desk(gridSize, bombCount);
@@ -47,23 +53,23 @@ const Index = () => {
   }
 
   return (
-    <Layout title={`Minesweepin'`}>
+    <Layout title={`Minesweepin' - Number of actions: ${ actions }`}>
       <DeskComp boardSize={ desk.rows } disabled={ desk.disabled }>
         { desk.squares.map((squareList, i) => (
           <Fragment key={ i }>
-          { squareList.map((square, j) => (
-              <SquareComp
-                key={ i + '-' + j }
-                disabled={ square.isRevealed }
-                gameOver={ square.gameOver }
-                onContextMenu={ () => setDesk(desk.updateSquare(square.setFlagged(true)))}
-                onClick={ () => onSquareClick(square)}>
-                  { square.showBomb() && <Mine />}
-                  { square.flagged && <Flag />}
-                  { square.showNumber() ? square.displayNumber : ''}
-              </SquareComp>
-            )
-          ) }
+            { squareList.map((square, j) => (
+                <SquareComp
+                  key={ i + '-' + j }
+                  disabled={ square.isRevealed }
+                  gameOver={ square.gameOver }
+                  onContextMenu={ () => setDesk(desk.updateSquare(square.setFlagged(true)))}
+                  onClick={ () => onSquareClick(square)}>
+                    { square.showBomb() && <Mine />}
+                    { square.flagged && <Flag />}
+                    { square.showNumber() ? square.displayNumber : ''}
+                </SquareComp>
+              )
+            ) }
           </Fragment>
         ))}
       </DeskComp>
