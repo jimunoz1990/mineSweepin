@@ -16,7 +16,7 @@ import { Desk } from "../models/desk";
 
 const Index = () => {
   const [gridSize, setGridSize] = useState(10);
-  const [bombCount, setBombCount] = useState(100);
+  const [bombCount, setBombCount] = useState(10);
   const [desk, setDesk] = useState(new Desk(gridSize, bombCount));
   // counter for actions taken
   const [actions, setActions] = useState(0);

@@ -22,8 +22,8 @@ export class Desk {
     let grid = [];
     for (let row = 0; row < size; row++) {
       grid.push([]);
-      for (let col = 0; j < size; col++) {
-        grid[i].push(new Square(row, col));
+      for (let col = 0; col < size; col++) {
+        grid[row].push(new Square(row, col));
       }
     }
     return grid;

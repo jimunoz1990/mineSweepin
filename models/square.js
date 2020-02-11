@@ -23,6 +23,7 @@ export class Square {
   // set isRevealed to true
   reveal() {
     this.isRevealed = true;
+    this.flagged = false; // remove flag when selected
     return this;
   }
 
