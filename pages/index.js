@@ -16,7 +16,7 @@ import { Desk } from '../models/desk';
 
 const Index = () => {
   const [gridSize, setGridSize] = useState(10);
-  const [bombCount, setBombCount] = useState(10);
+  const [bombCount, setBombCount] = useState(100);
   const [desk, setDesk] = useState(new Desk(gridSize, bombCount));
   // counter for actions taken
   const [actions, setActions] = useState(0);
@@ -30,10 +30,11 @@ const Index = () => {
         window.alert("Whoops, looks like you lost - you'll gettem next time!")
         newDesk = new Desk(gridSize, bombCount);
         setDesk(newDesk);
-      }, 1500)
+        setActions(0);
+      }, 1500);
       newDesk = desk.uncoverBoard(square.row, square.column, true);
       setDesk(newDesk);
-      setActions(0);
+      setActions('loser');
     } else  {
       newDesk = desk.findClearPath(square.row, square.column);
       if (newDesk.revealedSquares === (Math.pow(gridSize, 2) - bombCount)) { // winning
@@ -62,7 +63,10 @@ const Index = () => {
                   key={ i + '-' + j }
                   disabled={ square.isRevealed }
                   gameOver={ square.gameOver }
-                  onContextMenu={ () => setDesk(desk.updateSquare(square.setFlagged(true)))}
+                  onContextMenu={ () => {
+                    setDesk(desk.updateSquare(square.setFlagged(!square.flagged)));
+                    setActions(actions + 1);
+                  } }
                   onClick={ () => onSquareClick(square)}>
                     { square.showBomb() && <Mine />}
                     { square.flagged && <Flag />}
