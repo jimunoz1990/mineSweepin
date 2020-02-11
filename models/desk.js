@@ -1,12 +1,12 @@
-import { Square } from '../models/square'
+import { Square } from "../models/square";
 
 /**
-* Desk describes the full MineSweeper game state (assuming square board)
-*
-* rows - number - indicates number of rows
-* column - number - indicates number of column
-* squares - [][]Square - state of each square in the game
-*/
+ * Desk describes the full MineSweeper game state (assuming square board)
+ *
+ * rows - number - indicates number of rows
+ * column - number - indicates number of column
+ * squares - [][]Square - state of each square in the game
+ */
 
 export class Desk {
   constructor(size, bombs) {
@@ -20,10 +20,10 @@ export class Desk {
   // generate an empty grid
   createEmptyGrid(size) {
     let grid = [];
-    for (let i = 0; i < size; i++) {
+    for (let row = 0; row < size; row++) {
       grid.push([]);
-      for (let j = 0; j < size; j++) {
-        grid[i].push(new Square(i, j));
+      for (let col = 0; j < size; col++) {
+        grid[i].push(new Square(row, col));
       }
     }
     return grid;
@@ -46,15 +46,18 @@ export class Desk {
 
     grid = this.calculateNumbers(grid);
 
-    return grid
+    return grid;
   }
 
   // iterate through each square and update the displayNumber
   calculateNumbers(grid) {
-    let n = grid.length;
-    for (let row = 0; row < n; row++) {
-      for (let col = 0; col < n; col++) {
-        grid[row][col].displayNumber = this.calculateNumber(grid, grid[row][col]);
+    let size = grid.length;
+    for (let row = 0; row < size; row++) {
+      for (let col = 0; col < size; col++) {
+        grid[row][col].displayNumber = this.calculateNumber(
+          grid,
+          grid[row][col]
+        );
       }
     }
     return grid;
@@ -64,7 +67,7 @@ export class Desk {
   // up, upright, right, downright, down, downleft, left, upleft
   calculateNumber(grid, square) {
     // don't bother calculating if bomb
-    if (square.hasBomb){
+    if (square.hasBomb) {
       return null;
     }
 
@@ -85,7 +88,7 @@ export class Desk {
 
     // right
     if (col !== size - 1) {
-      count += !! grid[row][col + 1].hasBomb;
+      count += !!grid[row][col + 1].hasBomb;
     }
 
     // downright
@@ -120,12 +123,15 @@ export class Desk {
   findClearPath(row, col) {
     // ensure that the square is valid and without bomb, reveal it and then
     // continue expanding as long as the square does not have a displayNumber
-    if (row < 0 || row > this.rows || col < 0 || col > this.columns){
-        return this;
+    if (row < 0 || row > this.rows || col < 0 || col > this.columns) {
+      return this;
     }
-    if (!!this.squares[row] && !!this.squares[row][col] &&
-      !this.squares[row][col].hasBomb && !this.squares[row][col].isRevealed) {
-
+    if (
+      !!this.squares[row] &&
+      !!this.squares[row][col] &&
+      !this.squares[row][col].hasBomb &&
+      !this.squares[row][col].isRevealed
+    ) {
       this.squares[row][col].reveal();
       this.revealedSquares++;
       if (this.squares[row][col].displayNumber === 0) {
@@ -158,15 +164,15 @@ export class Desk {
       for (let col = 0; col < this.columns; col++) {
         let square = this.squares[row][col];
         if (square.hasBomb) {
-            square.reveal();
-            this.squares[row][col] = square;
+          square.reveal();
+          this.squares[row][col] = square;
         }
       }
     }
 
     // only light up the end square if it was a losing square
     if (lose) {
-        this.squares[gameOverRow][gameOverColumn].gameOver = true;
+      this.squares[gameOverRow][gameOverColumn].gameOver = true;
     }
     return this;
   }
