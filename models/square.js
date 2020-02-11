@@ -6,11 +6,17 @@ export class Square {
       this.row = row;
       this.column = column;
       this.number = null;
+      this.gameOver = false;
     }
 
     reveal() {
       this.isRevealed = true;
       return this
+    }
+
+    setFlagged(flagged) {
+      this.flagged = flagged;
+      return this;
     }
 
     showBomb() {
@@ -20,4 +26,5 @@ export class Square {
     showNumber() {
       return this.number && this.isRevealed;
     }
+
 }

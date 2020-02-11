@@ -6,39 +6,67 @@ import DeskComp from '../components/desk';
 import SquareComp from '../components/square';
 import Mine from '../components/mine';
 import Flag from '../components/flag';
+
+// desk model
 import { Desk } from '../models/desk';
 
-// TODO: make board size configurable
-// TODO: add how many squares are available to discover until
-// win condition is satisfied.
-
 const Index = () => {
-  const [desk, setDesk] = useState(new Desk(10, 10));
+  const [gridSize, setGridSize] = useState(10);
+  const [bombCount, setBombCount] = useState(10);
+  const [desk, setDesk] = useState(new Desk(gridSize, bombCount));
   // counter for actions taken
   const [actions, setActions] = useState(0);
 
   function onSquareClick(square) {
-    setActions(actions + 1);
-
+    let newDesk = null;
     if (square.hasBomb) {
-      window.alert("Whoops, looks like you lost - you'll gettem next time champ")
-      setDesk(new Desk(10, 10));
-    } else {
-      let newDesk = desk.findClearPath(square.row, square.column);
-      setDesk(newDesk.findClearPath(square));
+      window.setTimeout(() => {
+        window.alert("Whoops, looks like you lost - you'll gettem next time champ")
+        newDesk = new Desk(gridSize, bombCount);
+        setDesk(newDesk);
+      }, 1500)
+      newDesk = desk.uncoverBoard(square.row, square.column, true);
+      setDesk(newDesk);
+      setActions(0);
+    } else  {
+      newDesk = desk.findClearPath(square.row, square.column);
+      if (newDesk.revealedSquares === (Math.pow(gridSize, 2) - bombCount)) {
+          window.setTimeout(() => {
+            window.alert("You did it, congratulations!")
+            newDesk = new Desk(gridSize, bombCount);
+            setDesk(newDesk);
+          }, 1500);
+          newDesk = desk.uncoverBoard(square.row, square.column, false);
+          setDesk(newDesk);
+          setActions(0);
+      } else {
+          setDesk(newDesk);
+          setActions(actions + 1);
+      }
     }
   }
 
-  console.log('render');
+  function updateRows(event) {
+    console.log(event.target.value);
+    setGridSize(event.target.value);
+  }
+
+  function updateBombCount(event) {
+    console.log(event.target.value);
+    // setBombCount(bombs);
+  }
+
   return (
     <Layout title={`Minesweepin'`}>
-      <DeskComp boardSize={ desk.rows }>
+      <DeskComp boardSize={ desk.rows } disabled={ desk.disabled }>
         { desk.squares.map((squareList, i) => (
           <Fragment key={ i }>
           { squareList.map((square, j) => (
               <SquareComp
                 key={ i + '-' + j }
                 disabled={ square.isRevealed }
+                gameOver={ square.gameOver }
+                onContextMenu={ () => setDesk(desk.updateSquare(square.setFlagged(true)))}
                 onClick={ () => onSquareClick(square)}>
                   { square.showBomb() && <Mine />}
                   { square.flagged && <Flag />}
