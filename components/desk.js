@@ -1,9 +1,8 @@
 import { createComponent } from 'cf-style-container';
 
 const Desk = createComponent(({ boardSize }) => ({
-  width: 40 * boardSize + 2,
-  height: 40 * boardSize + 2,
-  border: `1px solid black`,
+  width: 40 * boardSize,
+  height: 40 * boardSize,
   display: 'flex',
   flexWrap: 'wrap'
 }));
